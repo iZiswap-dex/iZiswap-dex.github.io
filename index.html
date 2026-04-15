@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>iZiSwap — Discretized Liquidity AMM Guide: How It Works, iZi Token &amp; Multi-Chain DEX (2026)</title>
+  <meta name="description" content="Complete iZiSwap guide (2026): how iZiSwap's Discretized Liquidity AMM (DLMM) works, how to provide liquidity in price bins, iZi token staking and governance, limit orders on iZiSwap, supported chains, fee tiers, comparison with Uniswap V3 and Trader Joe, and a deep FAQ for DeFi liquidity providers.">
+  <meta name="author" content="Crypto Finance Experts">
+  <link rel="canonical" href="https://iziswap-guide.example.com/">
+  <link rel="icon" type="image/png" href="izi.png">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://iziswap-guide.example.com/">
+  <meta property="og:title" content="iZiSwap — Discretized Liquidity AMM Guide (2026)">
+  <meta property="og:description" content="How iZiSwap's DLMM works, liquidity bins, iZi token staking, limit orders, multi-chain support, and comparison with Uniswap V3.">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="iZiSwap Guide (2026)">
+  <meta name="twitter:description" content="How iZiSwap's Discretized Liquidity AMM works, iZi staking, limit orders, and multi-chain DEX for 2026.">
+
+  <style>
+    :root {
+      --b:    #0EA5E9;
+      --b2:   #0284C7;
+      --b3:   #0369A1;
+      --ba:   #38BDF8;
+      --bb:   #7DD3FC;
+      --bc:   #BAE6FD;
+      --bd:   #E0F2FE;
+      --be:   #F0F9FF;
+
+      /* accent — indigo for contrast */
+      --a:    #6366F1;
+      --aa:   #818CF8;
+      --ab:   #C7D2FE;
+
+      /* green for positive / active */
+      --ok:   #10B981;
+      --ok2:  #D1FAE5;
+
+      --ink:   #0C1A2E;
+      --sub:   #1E3A5F;
+      --muted: #4B6080;
+      --dim:   #6B7E94;
+      --light: #94A3B8;
+
+      --bg:    #FFFFFF;
+      --bg2:   #F0F9FF;
+      --bg3:   #E0F2FE;
+      --card:  #FFFFFF;
+      --card2: #F8FCFF;
+      --line:  #E2EEF8;
+      --line2: #CBD8E8;
+
+      --warn: #F59E0B;
+      --err:  #EF4444;
+
+      --r:  12px;
+      --rl: 18px;
+      --gap: 1.2rem;
+      --sh: 0 2px 16px rgba(14,165,233,.08), 0 1px 4px rgba(0,0,0,.04);
+      --shb: 0 4px 24px rgba(14,165,233,.16);
+      --sha: 0 4px 16px rgba(99,102,241,.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html { scroll-behavior: smooth }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--muted);
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { color: var(--b2); text-decoration: none }
+    a:hover { text-decoration: underline; color: var(--b3) }
+    img { max-width: 100%; height: auto; display: block }
+    strong { color: var(--sub); font-weight: 600 }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 1.4rem }
+
+    h1,h2,h3,h4 { color: var(--ink); line-height: 1.25 }
+    h1 { font-size: clamp(2.1rem,5vw,3.2rem); font-weight: 800; letter-spacing: -.5px }
+    h2 {
+      font-size: clamp(1.25rem,2.5vw,1.75rem); font-weight: 700;
+      margin-top: 1.8rem; padding-top: .75rem;
+      border-top: 2px solid var(--line);
+    }
+    h3 { font-size: 1.05rem; font-weight: 700; color: var(--b2) }
+    p,li { font-size: 1rem; line-height: 1.78 }
+    td,th { font-size: .96rem; line-height: 1.6 }
+    .lead { font-size: 1.08rem; color: var(--sub); line-height: 1.72 }
+
+    /* ── HEADER BAR ── */
+    .topbar {
+      background: var(--b);
+      height: 4px;
+    }
+
+    /* ── HERO ── */
+    header.hero {
+      background: linear-gradient(160deg, var(--be) 0%, var(--bd) 50%, var(--bg) 100%);
+      padding: clamp(3rem,6vw,5.5rem) 0 clamp(2rem,4vw,3.5rem);
+      border-bottom: 2px solid var(--line);
+    }
+    .hero-inner {
+      background: var(--card);
+      border: 1.5px solid var(--bc);
+      border-radius: var(--rl);
+      padding: clamp(1.6rem,3.5vw,2.8rem);
+      box-shadow: var(--shb);
+      position: relative; overflow: hidden;
+    }
+    .hero-inner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(186,230,253,.30) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .brand-row { display: flex; align-items: center; gap: .95rem; margin-bottom: 1.1rem; position: relative }
+    .brand-logo {
+      width: 58px; height: 58px; border-radius: 16px;
+      border: 1.5px solid var(--bc);
+      background: var(--bd);
+      padding: .3rem; object-fit: contain;
+      box-shadow: var(--shb);
+      flex: 0 0 auto;
+    }
+    .brand-label { color: var(--b2); font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px }
+    .brand-sub   { color: var(--muted); font-size: .85rem; margin-top: .1rem }
+
+    /* ── CTA ── */
+    .cta-center { display: flex; justify-content: center; margin-top: 2.2rem }
+    .cta {
+      display: inline-flex; align-items: center; gap: .7rem;
+      background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 45%, #0284C7 100%);
+      color: #fff;
+      padding: 1.15rem 3.2rem;
+      border-radius: 14px;
+      font-weight: 800; font-size: 1.12rem; letter-spacing: .1px;
+      box-shadow: 0 4px 20px rgba(14,165,233,.35), 0 1px 4px rgba(0,0,0,.08);
+      border: none; cursor: pointer; text-decoration: none;
+      transition: transform .18s, box-shadow .18s, filter .18s;
+    }
+    .cta:hover {
+      transform: translateY(-3px) scale(1.022); filter: brightness(1.07);
+      color: #fff; text-decoration: none;
+      box-shadow: 0 8px 32px rgba(14,165,233,.45), 0 2px 8px rgba(0,0,0,.10);
+    }
+
+    /* ── NOTE ── */
+    .note {
+      border-left: 3px solid var(--ba);
+      padding: .85rem 1rem;
+      background: var(--bd);
+      border-radius: 0 9px 9px 0;
+      color: var(--sub); margin-top: 1rem;
+    }
+    .note.green {
+      border-left-color: var(--ok);
+      background: var(--ok2);
+      color: #065F46;
+    }
+    .note.indigo {
+      border-left-color: var(--aa);
+      background: var(--ab);
+      color: #3730A3;
+    }
+
+    /* ── STEPS ── */
+    section.step-guide {
+      background: var(--bg2);
+      padding: clamp(2rem,5vw,3.5rem) 0;
+      border-top: 2px solid var(--line); border-bottom: 2px solid var(--line);
+    }
+    .steps { display: grid; gap: var(--gap); grid-template-columns: 1fr }
+    .step {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-top: 3px solid var(--b);
+      border-radius: var(--r);
+      padding: 1.25rem; box-shadow: var(--sh);
+      transition: transform .18s, box-shadow .18s, border-top-color .18s;
+    }
+    .step:hover { transform: translateY(-3px); box-shadow: var(--shb); border-top-color: var(--b2) }
+    .step .icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: inline-grid; place-items: center;
+      background: var(--bd); margin-bottom: .65rem;
+      font-weight: 800; font-size: .92rem; color: var(--b2);
+      border: 1.5px solid var(--bc);
+    }
+
+    /* ── CARD ── */
+    main { padding-top: .5rem; background: var(--bg) }
+    main .card {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-radius: var(--r); padding: 1.5rem; margin: 1.2rem 0;
+      box-shadow: var(--sh);
+    }
+    main .card > h2:first-child { margin-top: 0; border-top: none; padding-top: 0 }
+
+    /* ── TOC ── */
+    .toc {
+      border: 1.5px solid var(--bc);
+      background: var(--be);
+      border-radius: var(--r); padding: 1.1rem 1.3rem;
+    }
+    .toc strong { color: var(--ink) }
+    .toc ul { margin: .5rem 0 0; padding-left: 1.1rem }
+    .toc li { margin: .28rem 0; font-size: .96rem }
+    .toc a { font-weight: 600; color: var(--b2) }
+
+    /* ── CALLOUT GRID ── */
+    .callout-grid { display: grid; gap: var(--gap); grid-template-columns: 1fr; margin-top: .8rem }
+    .mini {
+      background: var(--bg2);
+      border: 1.5px solid var(--line);
+      border-radius: var(--r); padding: 1rem;
+    }
+    .mini h3 { margin-bottom: .35rem }
+    .kpi-badges { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .55rem }
+    .kpi-badges span {
+      border: 1.5px solid var(--bc); background: var(--bd);
+      color: var(--b2); padding: .26rem .54rem;
+      border-radius: 999px; font-size: .87rem; font-weight: 600;
+    }
+    .kpi-badges span.green {
+      border-color: #6EE7B7; background: var(--ok2);
+      color: #065F46;
+    }
+    .kpi-badges span.indigo {
+      border-color: var(--ab); background: #EEF2FF;
+      color: #4338CA;
+    }
+
+    /* ── DISCRETE LIQUIDITY VISUALISER — unique element ── */
+    .dlmm-viz {
+      margin-top: 1.1rem;
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--card);
+    }
+    .dv-header {
+      padding: .6rem 1.15rem;
+      background: var(--bg2);
+      border-bottom: 1.5px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .dv-title { font-size: .78rem; font-weight: 700; color: var(--b2); text-transform: uppercase; letter-spacing: .5px }
+    .dv-sub   { font-size: .76rem; color: var(--dim) }
+    .dv-body  { padding: 1.1rem 1.2rem 0 }
+
+    /* bar chart */
+    .dv-chart {
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 100px; position: relative;
+    }
+    .dv-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1 }
+    .dv-bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      transition: opacity .2s;
+    }
+    .dv-bar:hover { opacity: .80 }
+    .dv-bar.token-a { background: linear-gradient(180deg, #7DD3FC, #38BDF8) }
+    .dv-bar.token-b { background: linear-gradient(180deg, #A5B4FC, #818CF8) }
+    .dv-bar.active  { background: linear-gradient(180deg, #6EE7B7, #10B981); outline: 2px solid #10B981 }
+    .dv-tick { font-size: .64rem; color: var(--dim); white-space: nowrap; margin-top: 3px }
+
+    /* price labels */
+    .dv-labels {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .55rem 1.2rem;
+      border-top: 1.5px solid var(--line);
+      margin-top: .4rem;
+    }
+    .dv-price-label { font-size: .78rem; color: var(--dim) }
+    .dv-current {
+      font-size: .82rem; font-weight: 800;
+      background: var(--ok2); color: var(--ok);
+      padding: .2rem .6rem; border-radius: 6px;
+      border: 1.5px solid #6EE7B7;
+    }
+
+    /* legend */
+    .dv-legend {
+      display: flex; gap: 1.1rem; flex-wrap: wrap;
+      padding: .55rem 1.2rem;
+      background: var(--bg2);
+      border-top: 1.5px solid var(--line);
+    }
+    .dv-legend-item { display: flex; align-items: center; gap: .35rem; font-size: .78rem; color: var(--muted) }
+    .dv-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex: 0 0 auto }
+
+    /* ── FEE TIER CARDS ── */
+    .fee-grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); margin-top: 1rem }
+    .fee-card {
+      border: 1.5px solid var(--line); border-radius: var(--r);
+      padding: 1rem 1.15rem;
+      background: var(--card2);
+      display: flex; align-items: center; gap: 1rem;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .fee-card:hover { border-color: var(--bc); box-shadow: var(--shb) }
+    .fee-num {
+      font-size: 1.5rem; font-weight: 900; color: var(--b);
+      min-width: 70px;
+    }
+    .fee-body h3 { color: var(--ink); margin-bottom: .2rem; font-size: .96rem }
+    .fee-body p  { font-size: .88rem; color: var(--muted) }
+
+    /* ── CHAIN BADGES ── */
+    .chain-grid { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .85rem }
+    .chain {
+      background: var(--bg2); border: 1.5px solid var(--line);
+      border-radius: 8px; padding: .38rem .8rem;
+      font-size: .9rem; font-weight: 600; color: var(--sub);
+      transition: border-color .15s, background .15s;
+    }
+    .chain:hover { border-color: var(--bc); background: var(--bd) }
+
+    /* ── TOKO BARS ── */
+    .toko-bar { display: flex; flex-direction: column; gap: .6rem; margin-top: 1rem }
+    .toko-row { display: flex; align-items: center; gap: .85rem }
+    .toko-label { min-width: 200px; font-size: .92rem; color: var(--sub); font-weight: 600 }
+    .toko-track { flex: 1; height: 8px; background: var(--bc); border-radius: 999px; overflow: hidden }
+    .toko-fill  { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ba), var(--b)) }
+    .toko-val   { min-width: 55px; text-align: right; font-size: .9rem; font-weight: 700; color: var(--b2) }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--r); border: 1.5px solid var(--line) }
+    table { width: 100%; border-collapse: collapse; min-width: 480px }
+    th,td { padding: .8rem .95rem; border-bottom: 1.5px solid var(--line); text-align: left }
+    th { background: var(--bg2); color: var(--ink); font-weight: 700; font-size: .92rem }
+    tr.hi { background: var(--be) }
+    tr:hover td { background: var(--bg2) }
+    tr:last-child td { border-bottom: none }
+    .ok-t  { color: var(--ok) }
+    .warn-t{ color: var(--warn) }
+    .err-t { color: var(--err) }
+
+    /* ── EEAT ── */
+    .eeat {
+      background: var(--bg2);
+      border: 1.5px solid var(--bc);
+      border-radius: var(--r); padding: 1.5rem; box-shadow: var(--sh);
+    }
+    .eeat > h2:first-child { margin-top: 0; border-top: none; padding-top: 0 }
+
+    /* ── FAQ ── */
+    .faq-item { border-bottom: 1.5px solid var(--line); padding: .9rem 0 }
+    .faq-item:last-child { border-bottom: none }
+    .faq-button { all: unset; display: flex; justify-content: space-between; align-items: flex-start; width: 100%; cursor: pointer; gap: 1rem }
+    .faq-button:focus-visible { outline: 2px solid var(--b); border-radius: 4px }
+    .faq-button h3 { margin: 0; font-weight: 700; font-size: 1rem; line-height: 1.4; color: var(--ink) }
+    .faq-content { max-height: 0; overflow: hidden; transition: max-height .26s ease }
+    .faq-content.open { padding-top: .65rem }
+    .faq-plus { font-weight: 800; font-size: 1.35rem; color: var(--b); flex: 0 0 auto; line-height: 1; transition: transform .2s }
+    .faq-button[aria-expanded="true"] .faq-plus { transform: rotate(45deg) }
+
+    @media(min-width:860px){
+      .steps { grid-template-columns: repeat(4,1fr) }
+      .callout-grid { grid-template-columns: 1fr 1fr }
+      .fee-grid { grid-template-columns: 1fr 1fr 1fr }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<!-- HERO -->
+<header class="hero" role="banner">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="brand-row">
+        <img class="brand-logo" src="izi.png" alt="iZiSwap logo">
+        <div>
+          <div class="brand-label">Discretized Liquidity AMM · Multi-Chain DEX</div>
+          <div class="brand-sub">DLMM · Price Bins · Limit Orders · iZi Staking · 15+ Chains</div>
+        </div>
+      </div>
+
+      <h1>iZiSwap</h1>
+      <p class="lead" style="margin-top:.75rem">
+        The complete guide to <strong>iZiSwap</strong> — a next-generation
+        <strong>Discretized Liquidity AMM (DLMM)</strong> that concentrates
+        liquidity into <strong>discrete price bins</strong> for maximum capital
+        efficiency, enables native <strong>on-chain limit orders</strong>,
+        and operates across <strong>15+ EVM chains</strong> with a unified interface.
+        Understand how iZiSwap's DLMM model differs from Uniswap V3's concentrated
+        liquidity, how <strong>liquidity providers choose price bins</strong> to
+        maximise fee income, how <strong>iZi token staking</strong> unlocks
+        boosted rewards and governance rights, and how iZiSwap's
+        <strong>limit order protocol</strong> works without an off-chain order book.
+      </p>
+
+      <div class="cta-center">
+        <a href="#" class="cta" aria-label="Open iZiSwap">
+          <span>⚡</span> Open iZiSwap
+        </a>
+      </div>
+
+      <div class="note" style="margin-top:2rem">
+        <strong>What makes iZiSwap different from Uniswap V3:</strong>
+        While Uniswap V3 uses continuous price ranges, iZiSwap's DLMM segments
+        liquidity into discrete price points — each bin a mini constant-product pool.
+        This enables <strong>zero-slippage trades</strong> within a single bin,
+        <strong>native limit orders</strong> at specific price points,
+        and more predictable fee income for LPs who concentrate
+        on the active trading range.
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- STEPS -->
+<section class="step-guide" aria-labelledby="how-works">
+  <div class="container">
+    <h2 id="how-works" style="margin-top:0;border-top:none;padding-top:0;color:var(--ink)">
+      How iZiSwap Works: Add Liquidity to Bins → Earn Fees → Use Limit Orders → Claim iZi Rewards
+    </h2>
+    <div class="steps" role="list">
+      <article class="step" role="listitem">
+        <div class="icon">01</div>
+        <h3>Choose a trading pair and chain</h3>
+        <p>Connect your wallet on any of iZiSwap's 15+ supported EVM chains. Select the token pair you want to provide liquidity for. iZiSwap shows the current price, active bin, and fee tier options before you commit any capital.</p>
+      </article>
+      <article class="step" role="listitem">
+        <div class="icon">02</div>
+        <h3>Select price bins and deposit</h3>
+        <p>Choose which discrete price bins to provide liquidity in. Concentrate around the current price to maximise fee earnings, or spread across a wider range for lower maintenance. Each bin functions as an independent mini-pool earning fees when trades pass through it.</p>
+      </article>
+      <article class="step" role="listitem">
+        <div class="icon">03</div>
+        <h3>Earn trading fees and iZi rewards</h3>
+        <p>As swaps execute through your bins, you earn a proportional share of the trading fee. Active iZi stakers receive additional iZi token rewards on top of trading fees — boosting total LP yield beyond raw fee income.</p>
+      </article>
+      <article class="step" role="listitem">
+        <div class="icon">04</div>
+        <h3>Place limit orders at specific price bins</h3>
+        <p>iZiSwap's limit order protocol lets you place a buy or sell order at a specific price bin — executed on-chain when the market price reaches that bin. No off-chain order book, no custody risk, no counterparty. Limit orders are self-custodial DeFi primitives.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="container" role="main">
+
+  <!-- TOC -->
+  <section class="card toc" aria-label="Table of Contents">
+    <strong>On this page — iZiSwap:</strong>
+    <ul>
+      <li><a href="#overview">What is iZiSwap and the DLMM model explained</a></li>
+      <li><a href="#dlmm">Discretized Liquidity: how price bins work and why it matters</a></li>
+      <li><a href="#limit-orders">iZiSwap limit orders: how on-chain limit orders work without an order book</a></li>
+      <li><a href="#fee-tiers">Fee tiers: choosing the right pool for your pair</a></li>
+      <li><a href="#izi-token">iZi token: staking, governance, and LP boost rewards</a></li>
+      <li><a href="#chains">Supported chains and protocol reach</a></li>
+      <li><a href="#lp-guide">How to provide liquidity on iZiSwap: step-by-step</a></li>
+      <li><a href="#safety">iZiSwap security and LP risks</a></li>
+      <li><a href="#comparison">iZiSwap vs Uniswap V3 vs Trader Joe DLMM vs Maverick</a></li>
+      <li><a href="#best-practices">Best practices for iZiSwap LPs and traders</a></li>
+      <li><a href="#troubleshooting">Troubleshooting: missing fees, limit order not filling, bin selection</a></li>
+      <li><a href="#eeat">Authoritative sources &amp; references</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section class="card" id="overview">
+    <h2>What Is iZiSwap and the DLMM Model Explained</h2>
+    <p>
+      <strong>iZiSwap</strong> is a decentralised exchange built on
+      <strong>Discretized Liquidity Market Making (DLMM)</strong> —
+      a model that divides the price space into discrete, individual price points
+      called <strong>bins</strong>, each functioning as a fully independent
+      constant-product mini-pool.
+    </p>
+    <p>
+      Unlike Uniswap V3's continuous concentrated liquidity (where LPs choose a price range
+      and liquidity is distributed continuously), iZiSwap's bins are atomic —
+      a trade that stays within a single bin experiences <strong>zero slippage</strong>,
+      and only moves to the next bin when the first is exhausted.
+      This discretised structure also enables true
+      <strong>on-chain limit orders</strong> at specific price points —
+      a feature impossible in continuous AMM models.
+    </p>
+
+    <div class="callout-grid">
+      <div class="mini">
+        <h3>For liquidity providers</h3>
+        <p style="color:var(--muted)">Concentrate liquidity in active price bins near current market price to maximise fee income. When price moves into your bin, your liquidity earns fees on every swap. Unlike Uniswap V3 ranges, DLMM bins have cleaner accounting — you know exactly which bins are earning and can add/remove bin by bin.</p>
+        <div class="kpi-badges"><span>Zero slippage in-bin</span><span>Bin-by-bin control</span><span>iZi rewards</span></div>
+      </div>
+      <div class="mini">
+        <h3>For DeFi traders</h3>
+        <p style="color:var(--muted)">Access competitive swap prices across 15+ chains with iZiSwap's deep DLMM liquidity on major pairs. Use iZiSwap's native limit order protocol to set precise entry and exit prices on-chain — executed automatically when market reaches your target without CEX dependency or custody risk.</p>
+        <div class="kpi-badges"><span>On-chain limit orders</span><span>15+ chains</span><span>Low slippage</span></div>
+      </div>
+      <div class="mini">
+        <h3>For iZi stakers</h3>
+        <p style="color:var(--muted)">Stake iZi tokens to earn veiZi — vote-escrowed iZi — which boosts your LP rewards through the Curve-inspired gauge system, provides governance voting power over fee parameters and new pool deployments, and grants a share of protocol fee revenue.</p>
+        <div class="kpi-badges"><span class="indigo">veiZi boost</span><span class="indigo">Gauge voting</span><span class="indigo">Fee revenue</span></div>
+      </div>
+      <div class="mini">
+        <h3>For protocol integrators</h3>
+        <p style="color:var(--muted)">iZiSwap's smart contracts support integration as a liquidity source for DEX aggregators and DeFi protocols. The discretised model makes price computation predictable and gas-efficient for on-chain integrations — multiple aggregators route through iZiSwap on chains where it offers best execution.</p>
+        <div class="kpi-badges"><span>Aggregator routing</span><span>Gas-efficient</span><span>Open API</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DLMM -->
+  <section class="card" id="dlmm">
+    <h2>Discretized Liquidity: How Price Bins Work and Why It Matters</h2>
+    <p>
+      The core innovation of iZiSwap is the <strong>discrete price bin</strong> —
+      a single price point that acts as a complete, independent AMM pool.
+      Understanding bins is the foundation for effective LP participation.
+    </p>
+
+    <!-- Discrete Liquidity Visualiser — unique design element -->
+    <h3 style="margin-top:1.1rem;margin-bottom:.5rem">DLMM liquidity distribution — ETH/USDC pair (illustrative)</h3>
+    <div class="dlmm-viz" role="img" aria-label="Discrete liquidity bin chart showing token A (blue) and token B (indigo) bins around current price with active bin in green">
+
+      <div class="dv-header">
+        <span class="dv-title">Liquidity Distribution across Price Bins</span>
+        <span class="dv-sub">Each bar = one discrete price bin · Active bin = current price</span>
+      </div>
+
+      <div class="dv-body">
+        <div class="dv-chart" role="presentation">
+          <!-- below current price — token B (USDC) bins -->
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:18px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:25px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:35px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:52px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:68px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:82px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:90px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-b" style="height:96px"></div></div>
+
+          <!-- active bin — current price -->
+          <div class="dv-bar-wrap">
+            <div class="dv-bar active" style="height:100px"></div>
+            <span class="dv-tick" style="color:var(--ok);font-weight:700">▲ NOW</span>
+          </div>
+
+          <!-- above current price — token A (ETH) bins -->
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:96px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:88px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:74px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:58px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:42px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:28px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:18px"></div></div>
+          <div class="dv-bar-wrap"><div class="dv-bar token-a" style="height:10px"></div></div>
+        </div>
+      </div>
+
+      <div class="dv-labels">
+        <span class="dv-price-label">← Lower price (more USDC)</span>
+        <span class="dv-current">Current Price Bin</span>
+        <span class="dv-price-label">(more ETH) Higher price →</span>
+      </div>
+
+      <div class="dv-legend">
+        <div class="dv-legend-item">
+          <div class="dv-legend-dot" style="background:#7DD3FC"></div>
+          Token A (ETH) — held in bins above current price
+        </div>
+        <div class="dv-legend-item">
+          <div class="dv-legend-dot" style="background:#818CF8"></div>
+          Token B (USDC) — held in bins below current price
+        </div>
+        <div class="dv-legend-item">
+          <div class="dv-legend-dot" style="background:#10B981"></div>
+          Active bin — both tokens, earns fees now
+        </div>
+      </div>
+    </div>
+
+    <div class="callout-grid" style="margin-top:1.2rem">
+      <div class="mini">
+        <h3>Key bin mechanics</h3>
+        <p style="color:var(--muted)">Each bin holds only one token on either side of the current price — bins below current price hold token B (quote/stablecoin); bins above hold token A (base). The active bin at current price holds both tokens simultaneously and earns all trading fees. As price moves up through bins, it converts token B to token A; moving down converts token A to token B.</p>
+        <div class="kpi-badges"><span>Zero slippage within bin</span><span>Fee-earning active bin</span><span>Auto-conversion</span></div>
+      </div>
+      <div class="mini">
+        <h3>LP strategy choices</h3>
+        <p style="color:var(--muted)">Aggressive LPs concentrate all liquidity in 1–3 bins around current price for maximum fee intensity — but risk going out-of-range quickly and requiring frequent rebalancing. Conservative LPs spread across 20–50 bins for a passive strategy similar to Uniswap V3 with lower management overhead. iZiSwap supports both strategies simultaneously in the same pool.</p>
+        <div class="kpi-badges"><span>Tight range</span><span>Wide range</span><span>Mixed strategies</span></div>
+      </div>
+    </div>
+
+    <div class="note green">
+      <strong>Why zero-slippage within a bin matters for large trades:</strong>
+      When a large trade executes within a single bin, every token in that bin
+      is swapped at exactly the bin's price — no slippage within the bin itself.
+      Only when the trade exhausts that bin and moves to the next does the
+      effective price change. This results in step-function price impact
+      rather than the smooth curve of standard AMMs,
+      which is more predictable for algorithmic traders and market makers.
+    </div>
+  </section>
+
+  <!-- LIMIT ORDERS -->
+  <section class="card" id="limit-orders">
+    <h2>iZiSwap Limit Orders: On-Chain Limit Orders Without an Order Book</h2>
+    <p>
+      iZiSwap's <strong>limit order protocol</strong> is one of its most distinctive features —
+      enabling traders to place buy and sell orders at specific price points
+      that execute automatically on-chain when the market reaches that price.
+    </p>
+
+    <div class="callout-grid">
+      <div class="mini">
+        <h3>How limit orders work on DLMM</h3>
+        <p style="color:var(--muted)">A limit order on iZiSwap is a token deposit into a specific price bin above (sell order) or below (buy order) the current price. When the market price moves to reach that bin, the order is naturally executed as the AMM swaps through it — no oracle, no keeper network, no off-chain matching. The execution is a direct consequence of the bin's AMM mechanics.</p>
+        <div class="kpi-badges"><span>Zero custodial risk</span><span>On-chain execution</span><span>No oracle needed</span></div>
+      </div>
+      <div class="mini">
+        <h3>Limit order types</h3>
+        <p style="color:var(--muted)">Buy limit: deposit token B (USDC) into a bin below current price — executes when price falls to that bin, converting your USDC to token A at your target price. Sell limit: deposit token A (ETH) into a bin above current price — executes when price rises to that bin, converting your ETH to USDC at your target price. Both are single-sided liquidity deposits in specific bins.</p>
+        <div class="kpi-badges"><span>Buy below market</span><span>Sell above market</span><span>Self-executing</span></div>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:1rem">
+      <table aria-label="Limit order comparison">
+        <thead>
+          <tr><th>Feature</th><th>iZiSwap limit orders</th><th>CEX limit orders</th><th>1inch limit orders</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hi">
+            <td>Custody</td>
+            <td class="ok-t">Non-custodial — tokens in AMM</td>
+            <td class="err-t">Custodial — CEX holds tokens</td>
+            <td class="ok-t">Non-custodial — wallet signs</td>
+          </tr>
+          <tr>
+            <td>Execution mechanism</td>
+            <td>AMM bin traversal — on-chain</td>
+            <td>Order book matching — off-chain</td>
+            <td>Keeper network fills order</td>
+          </tr>
+          <tr class="hi">
+            <td>Partial fill</td>
+            <td class="ok-t">Yes — bins fill gradually</td>
+            <td class="ok-t">Yes</td>
+            <td class="ok-t">Yes</td>
+          </tr>
+          <tr>
+            <td>Fee when filled</td>
+            <td class="warn-t">LP earns fee (you are the LP)</td>
+            <td class="ok-t">Often zero maker fee</td>
+            <td class="ok-t">Zero platform fee</td>
+          </tr>
+          <tr class="hi">
+            <td>KYC required</td>
+            <td class="ok-t">No</td>
+            <td class="err-t">Yes</td>
+            <td class="ok-t">No</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note indigo">
+      <strong>Limit order LPs actually earn fees:</strong>
+      When you place a limit order on iZiSwap, you're not just waiting to be filled —
+      you're acting as a liquidity provider in that bin.
+      If other traders swap through your bin before price reaches your limit,
+      you earn trading fees on those swaps.
+      Your limit order is essentially fee-earning LP liquidity that auto-converts
+      when price reaches your target — a more productive use of capital
+      than idle limit orders on a CEX.
+    </div>
+  </section>
+
+  <!-- FEE TIERS -->
+  <section class="card" id="fee-tiers">
+    <h2>Fee Tiers: Choosing the Right Pool for Your Trading Pair</h2>
+    <p>
+      iZiSwap offers multiple fee tiers per pair — allowing LPs to choose
+      the fee level appropriate for the pair's volatility and trading pattern.
+    </p>
+
+    <div class="fee-grid" role="list">
+      <div class="fee-card" role="listitem">
+        <div class="fee-num">0.01%</div>
+        <div class="fee-body">
+          <h3>Stable pairs</h3>
+          <p>USDC/USDT, DAI/USDC, stablecoin-to-stablecoin swaps. Very low fee for near-zero-risk stable pairs where volume is high and slippage is minimal.</p>
+        </div>
+      </div>
+      <div class="fee-card" role="listitem">
+        <div class="fee-num">0.04%</div>
+        <div class="fee-body">
+          <h3>Major pairs</h3>
+          <p>ETH/USDC, BTC/USDC, and other blue-chip pairs with deep liquidity. Appropriate for highly liquid pairs with moderate volatility and competitive LP market.</p>
+        </div>
+      </div>
+      <div class="fee-card" role="listitem">
+        <div class="fee-num">0.20%</div>
+        <div class="fee-body">
+          <h3>Mid-tier pairs</h3>
+          <p>Mid-cap altcoins and less liquid pairs. Higher fee compensates LPs for impermanent loss risk on more volatile pairs with lower natural volume.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:1rem">
+      <strong>Choose fee tier based on pair volatility, not personal preference:</strong>
+      The correct fee tier is the one where the fee income from trading volume
+      exceeds the impermanent loss from price divergence.
+      For stablecoin pairs, 0.01% is enough because IL is near-zero.
+      For volatile altcoins, 0.20% compensates for higher IL risk.
+      Check which fee tier has the most existing TVL — the market's LP competition
+      reveals which tier is most used for that pair.
+    </div>
+  </section>
+
+  <!-- IZI TOKEN -->
+  <section class="card" id="izi-token">
+    <h2>iZi Token: Staking, veiZi, and LP Boost Rewards</h2>
+    <p>
+      <strong>iZi</strong> is iZiSwap's native governance and incentive token —
+      used in a vote-escrow model inspired by Curve's veCRV to boost LP rewards,
+      direct gauge emissions, and govern protocol parameters.
+    </p>
+
+    <div class="callout-grid">
+      <div class="mini">
+        <h3>veiZi — vote-escrowed iZi</h3>
+        <p style="color:var(--muted)">Lock iZi for up to 4 years to receive veiZi — the longer the lock, the more veiZi per iZi. veiZi gives you governance voting power and a boost multiplier on LP rewards (up to 2.5× base rewards). veiZi decays over time as the lock approaches expiry — extend your lock to maintain maximum boost.</p>
+        <div class="kpi-badges"><span class="indigo">Up to 2.5× boost</span><span class="indigo">4-year max lock</span><span class="indigo">Decaying balance</span></div>
+      </div>
+      <div class="mini">
+        <h3>Gauge voting</h3>
+        <p style="color:var(--muted)">veiZi holders vote weekly on gauge weights — which pools receive iZi token emissions. Pools with more gauge votes receive more iZi incentives for their LPs. This creates a competitive dynamic where protocols seeking deep liquidity on iZiSwap may bribe veiZi holders to vote for their pool's gauge.</p>
+        <div class="kpi-badges"><span>Weekly gauges</span><span>Bribe system</span><span>Pool incentives</span></div>
+      </div>
+    </div>
+
+    <div class="toko-bar" role="list" aria-label="iZi token distribution">
+      <div class="toko-row" role="listitem">
+        <span class="toko-label">Liquidity mining rewards</span>
+        <div class="toko-track"><div class="toko-fill" style="width:40%"></div></div>
+        <span class="toko-val">40%</span>
+      </div>
+      <div class="toko-row" role="listitem">
+        <span class="toko-label">Team &amp; advisors (vested)</span>
+        <div class="toko-track"><div class="toko-fill" style="width:20%"></div></div>
+        <span class="toko-val">20%</span>
+      </div>
+      <div class="toko-row" role="listitem">
+        <span class="toko-label">Ecosystem &amp; foundation</span>
+        <div class="toko-track"><div class="toko-fill" style="width:20%"></div></div>
+        <span class="toko-val">20%</span>
+      </div>
+      <div class="toko-row" role="listitem">
+        <span class="toko-label">Investors (vested)</span>
+        <div class="toko-track"><div class="toko-fill" style="width:15%"></div></div>
+        <span class="toko-val">15%</span>
+      </div>
+      <div class="toko-row" role="listitem">
+        <span class="toko-label">IDO / public sale</span>
+        <div class="toko-track"><div class="toko-fill" style="width:5%"></div></div>
+        <span class="toko-val">5%</span>
+      </div>
+    </div>
+    <p style="font-size:.88rem; color:var(--dim); margin-top:.65rem">Indicative distribution — verify via official iZiSwap documentation.</p>
+  </section>
+
+  <!-- CHAINS -->
+  <section class="card" id="chains">
+    <h2>Supported Chains and Protocol Reach</h2>
+    <p>
+      iZiSwap's multi-chain architecture is one of its defining strengths —
+      deployed natively on 15+ EVM chains, bringing DLMM liquidity
+      to ecosystems beyond Ethereum mainnet.
+    </p>
+
+    <div class="chain-grid" role="list" aria-label="Supported networks">
+      <span class="chain">Ethereum</span>
+      <span class="chain">BNB Chain</span>
+      <span class="chain">Polygon</span>
+      <span class="chain">Arbitrum</span>
+      <span class="chain">Optimism</span>
+      <span class="chain">zkSync Era</span>
+      <span class="chain">Linea</span>
+      <span class="chain">Scroll</span>
+      <span class="chain">Base</span>
+      <span class="chain">Mantle</span>
+      <span class="chain">Manta Pacific</span>
+      <span class="chain">Cronos zkEVM</span>
+      <span class="chain">Merlin Chain</span>
+      <span class="chain">+ more</span>
+    </div>
+
+    <div class="note" style="margin-top:1rem">
+      <strong>Strong ZK-rollup presence:</strong>
+      iZiSwap has been particularly active in the ZK-rollup ecosystem —
+      one of the earliest DEXs deployed on zkSync Era, Linea, Scroll, and Manta Pacific.
+      This positioning makes iZiSwap a key liquidity source on chains
+      where DeFi infrastructure is still developing,
+      often capturing significant market share before larger competitors arrive.
+    </div>
+  </section>
+
+  <!-- LP GUIDE -->
+  <section class="card" id="lp-guide">
+    <h2>How to Provide Liquidity on iZiSwap: Step-by-Step</h2>
+    <ol style="padding-left:1.3rem">
+      <li style="margin-bottom:.6rem"><strong>Connect wallet and select chain</strong> — navigate to izumi.finance and connect your EVM wallet. Select the chain where you want to provide liquidity. Ensure you hold both tokens in the pair you want to LP (or just one token for a limit order position).</li>
+      <li style="margin-bottom:.6rem"><strong>Navigate to Liquidity &gt; Add Liquidity</strong> — select the token pair (e.g. ETH/USDC) and the fee tier appropriate for that pair (0.01% for stables, 0.04% for major pairs, 0.20% for mid-tier).</li>
+      <li style="margin-bottom:.6rem"><strong>Choose your price range (bin selection)</strong> — iZiSwap shows the current price and the bin chart. Select the minimum and maximum price for your liquidity. Concentrating near the current price maximises fee income but requires more active management. A wider range is more passive but earns lower fees per dollar deployed.</li>
+      <li style="margin-bottom:.6rem"><strong>Enter token amounts</strong> — iZiSwap calculates the required ratio of token A to token B based on your selected range. If your range is entirely below current price, you deposit only token B; if entirely above, only token A; if straddling current price, both.</li>
+      <li style="margin-bottom:.6rem"><strong>Approve tokens and confirm</strong> — approve each token for the iZiSwap contract (one-time per token per chain), then confirm the liquidity transaction. Your position is minted as an NFT representing your specific bin range and amounts.</li>
+      <li style="margin-bottom:.6rem"><strong>Stake LP position for iZi rewards</strong> — after adding liquidity, visit the Farm section and stake your LP NFT to earn iZi token rewards on top of trading fees. Unstaking is available at any time.</li>
+      <li><strong>Monitor and rebalance</strong> — if price moves significantly out of your range, your position stops earning fees. Check your position periodically — if price has moved outside your bin range, consider removing liquidity and redeploying at the new active price range.</li>
+    </ol>
+  </section>
+
+  <!-- SAFETY -->
+  <section class="card" id="safety">
+    <h2>iZiSwap Security and LP Risks</h2>
+
+    <div class="table-wrap">
+      <table aria-label="Security and risk analysis">
+        <thead>
+          <tr><th>Risk</th><th>Level</th><th>Mitigation</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hi">
+            <td>Smart-contract exploit</td>
+            <td class="warn-t">Medium</td>
+            <td>iZiSwap contracts audited by multiple firms; deployed and operating on 15+ chains with significant TVL. Bug bounty programme active.</td>
+          </tr>
+          <tr>
+            <td>Impermanent loss from out-of-range LP</td>
+            <td class="warn-t">Medium-High</td>
+            <td>Tightly concentrated bins are most capital-efficient when price stays in range — but fully convert to one token when price moves out. Monitor positions and rebalance when price moves significantly away from your range.</td>
+          </tr>
+          <tr class="hi">
+            <td>iZi token price risk</td>
+            <td class="warn-t">Medium</td>
+            <td>iZi rewards are denominated in iZi — falling iZi price reduces USD yield from farming. Calculate farming returns assuming iZi at zero to understand base fee income without token incentives.</td>
+          </tr>
+          <tr>
+            <td>Limit order price slippage risk</td>
+            <td class="warn-t">Low</td>
+            <td>Limit orders execute at the bin price — the execution price is the bin's defined price, not subject to slippage. However, in very fast price moves, multiple bins may execute in a single transaction beyond your intended price.</td>
+          </tr>
+          <tr class="hi">
+            <td>Phishing / fake iZiSwap sites</td>
+            <td class="err-t">High (user-controlled)</td>
+            <td>Bookmark izumi.finance; verify domain every session; never approve tokens on sites reached via social media links.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="card" id="comparison">
+    <h2>iZiSwap vs Uniswap V3 vs Trader Joe DLMM vs Maverick</h2>
+
+    <div class="table-wrap">
+      <table aria-label="DEX comparison">
+        <thead>
+          <tr><th>Feature</th><th>iZiSwap</th><th>Uniswap V3</th><th>Trader Joe DLMM</th><th>Maverick</th></div>
+        </thead>
+        <tbody>
+          <tr class="hi">
+            <td>Liquidity model</td>
+            <td class="ok-t">DLMM — discrete bins</td>
+            <td class="warn-t">CLMM — continuous range</td>
+            <td class="ok-t">DLMM — discrete bins</td>
+            <td class="warn-t">Dynamic directional AMM</td>
+          </tr>
+          <tr>
+            <td>Zero slippage within unit</td>
+            <td class="ok-t">Yes — within each bin</td>
+            <td class="err-t">No — continuous curve</td>
+            <td class="ok-t">Yes — within each bin</td>
+            <td class="err-t">No</td>
+          </tr>
+          <tr class="hi">
+            <td>Native limit orders</td>
+            <td class="ok-t">Yes — bin-based</td>
+            <td class="err-t">No</td>
+            <td class="err-t">No</td>
+            <td class="err-t">No</td>
+          </tr>
+          <tr>
+            <td>Multi-chain deployment</td>
+            <td class="ok-t">15+ chains incl. ZK-rollups</td>
+            <td class="ok-t">10+ chains</td>
+            <td class="warn-t">Avalanche + select chains</td>
+            <td class="warn-t">Ethereum + select L2s</td>
+          </tr>
+          <tr class="hi">
+            <td>Vote-escrow tokenomics</td>
+            <td class="ok-t">veiZi — Curve model</td>
+            <td class="warn-t">UNI — basic governance</td>
+            <td class="ok-t">veJOE</td>
+            <td class="warn-t">veMAV</td>
+          </tr>
+          <tr>
+            <td>Aggregator routing</td>
+            <td class="ok-t">Major aggregators</td>
+            <td class="ok-t">All major aggregators</td>
+            <td class="warn-t">Avalanche aggregators</td>
+            <td class="warn-t">Select aggregators</td>
+          </tr>
+          <tr class="hi">
+            <td>ZK-rollup presence</td>
+            <td class="ok-t">Strongest — 5+ ZK chains</td>
+            <td class="warn-t">Limited</td>
+            <td class="err-t">Minimal</td>
+            <td class="warn-t">Some</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:1rem">
+      <strong>iZiSwap's clearest advantage: ZK-rollup coverage + limit orders.</strong>
+      Among DLMM-style DEXs, iZiSwap's unique differentiation is its combination of
+      deep ZK-rollup chain deployment (zkSync Era, Linea, Scroll, Manta, Mantle)
+      and native limit orders — features Trader Joe (primarily Avalanche-focused)
+      and Uniswap V3 (no limit orders) don't offer.
+      For traders on ZK-rollup chains wanting limit order functionality,
+      iZiSwap is often the best available option.
+    </div>
+  </section>
+
+  <!-- BEST PRACTICES -->
+  <section class="card" id="best-practices">
+    <h2>Best Practices for iZiSwap LPs and Traders</h2>
+
+    <h3>For liquidity providers</h3>
+    <ul style="padding-left:1.2rem; margin-bottom:1.2rem">
+      <li style="margin-bottom:.5rem"><strong>Start with a wide bin range until you understand DLMM mechanics</strong> — the temptation is to concentrate aggressively for maximum fees, but wide ranges require much less monitoring and rebalancing. Learn the protocol with a passive strategy before going narrow.</li>
+      <li style="margin-bottom:.5rem"><strong>Set a price alert for the edges of your range</strong> — when price moves outside your bin range, you stop earning fees. Set DexTools or exchange alerts at your range boundaries so you know when to rebalance without constant monitoring.</li>
+      <li style="margin-bottom:.5rem"><strong>Stake your LP NFT in the farm immediately after minting</strong> — iZi farming rewards only accrue when your LP NFT is staked. Don't leave your position unstaked — even a few days of unclaimed iZi rewards adds up over time.</li>
+      <li><strong>Lock iZi for veiZi to boost LP rewards</strong> — the 2.5× boost for maximum veiZi holders significantly outperforms baseline LP returns. Calculate whether locking iZi for 1–4 years is appropriate for your strategy before committing.</li>
+    </ul>
+
+    <h3>For traders using iZiSwap</h3>
+    <ul style="padding-left:1.2rem">
+      <li style="margin-bottom:.5rem"><strong>Use limit orders for DCA strategies</strong> — iZiSwap's limit orders are ideal for dollar-cost-averaging into positions. Set multiple buy limit orders at different price bins below current price to accumulate a target token if it pulls back.</li>
+      <li><strong>Compare iZiSwap quotes via a DEX aggregator</strong> — for large swaps, check 1inch or Paraswap for the best available price. On ZK-rollup chains where iZiSwap has dominant liquidity, it often wins — but verify for each trade.</li>
+    </ul>
+  </section>
+
+  <!-- TROUBLESHOOTING -->
+  <section class="card" id="troubleshooting">
+    <h2>Troubleshooting iZiSwap: Missing Fees, Limit Orders, and Bin Selection</h2>
+
+    <h3>"My LP position isn't earning fees"</h3>
+    <ul style="padding-left:1.2rem">
+      <li>The most common cause is that the current market price has moved outside your selected bin range. Only bins that contain the current price earn trading fees — bins entirely above or below the current price hold a single token and earn nothing until price re-enters the range. Check your position and compare your range to the current price in the iZiSwap interface.</li>
+      <li>If price is within your range, verify your LP NFT is staked in the Farm section for iZi rewards. Trading fee accrual occurs automatically from LP provision, but iZi rewards require active staking of the LP NFT.</li>
+    </ul>
+
+    <h3>"My limit order hasn't executed even though price reached my target"</h3>
+    <ul style="padding-left:1.2rem">
+      <li>Limit orders on iZiSwap execute when the AMM traverses your target bin. If price briefly touched your bin level but the AMM didn't have sufficient swap volume to fully process it, the order may be partially filled or pending. Check the order status in the iZiSwap interface — partial fills show the converted portion.</li>
+      <li>Very fast price movements may jump over bins rather than passing through them sequentially in a single transaction. If price moved rapidly past your bin in a large trade, your bin may have been fully filled but the transaction is processing — refresh after a few minutes.</li>
+    </ul>
+
+    <h3>"I can't select the bin range I want"</h3>
+    <ul style="padding-left:1.2rem">
+      <li>iZiSwap's minimum price range is one bin — you can concentrate to a single discrete price point for maximum fee intensity or limit order placement. If the UI is restricting your selection, check whether you're in LP mode vs limit order mode — they have different bin selection interfaces.</li>
+    </ul>
+
+    <div class="note">
+      <strong>iZiSwap documentation and Discord:</strong>
+      For any iZiSwap-specific issue, the official documentation at docs.izumi.finance
+      has detailed DLMM mechanics documentation.
+      The official Discord has an active community and support team
+      for technical questions about bin selection, LP strategies, and farm staking.
+    </div>
+  </section>
+
+  <!-- EEAT -->
+  <section class="eeat" id="eeat" aria-labelledby="eeat-title">
+    <h2 id="eeat-title">iZiSwap: Authoritative References &amp; External Sources</h2>
+
+    <h3>iZiSwap — Official Sources</h3>
+    <ul style="padding-left:1.2rem">
+      <li><a href="https://izumi.finance/trade/swap" target="_blank" rel="noopener nofollow">iZiSwap — Official DEX Interface</a></li>
+      <li><a href="https://docs.izumi.finance/" target="_blank" rel="noopener nofollow">iZiSwap — Official Documentation</a></li>
+      <li><a href="https://github.com/izumiFinance" target="_blank" rel="noopener nofollow">iZumi Finance — GitHub (Smart Contracts)</a></li>
+      <li><a href="https://izumi.finance/paper/AMM_White_Paper.pdf" target="_blank" rel="noopener nofollow">iZiSwap — Discretized Liquidity Whitepaper</a></li>
+    </ul>
+
+    <h3>Analytics &amp; Data</h3>
+    <ul style="padding-left:1.2rem">
+      <li><a href="https://defillama.com/protocol/iziswap" target="_blank" rel="noopener nofollow">DeFiLlama — iZiSwap TVL &amp; Volume Data</a></li>
+      <li><a href="https://dune.com/browse/dashboards" target="_blank" rel="noopener nofollow">Dune Analytics — iZiSwap On-Chain Dashboards</a></li>
+      <li><a href="https://etherscan.io/" target="_blank" rel="noopener nofollow">Etherscan — iZiSwap Contract Verification</a></li>
+    </ul>
+
+    <h3>Security</h3>
+    <ul style="padding-left:1.2rem">
+      <li><a href="https://revoke.cash/" target="_blank" rel="noopener nofollow">Revoke.cash — Token Approval Manager</a></li>
+    </ul>
+
+    <div class="note" style="margin-top:1.2rem">
+      <strong>About:</strong> Prepared by Crypto Finance Experts as a practical, SEO-oriented knowledge base for
+      <em>iZiSwap</em>: Discretized Liquidity AMM, price bins, limit orders, iZi/veiZi staking, gauge voting, multi-chain deployment, and comparison with Uniswap V3.
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="card" id="faq" aria-labelledby="faq-title">
+    <h2 id="faq-title" style="margin-top:0;border-top:none;padding-top:0">iZiSwap: Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f1" id="b1">
+        <h3>What is iZiSwap and how does DLMM differ from Uniswap V3?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f1" class="faq-content" role="region" aria-labelledby="b1">
+        <p>iZiSwap is a DEX built on Discretized Liquidity Market Making (DLMM) — a model where the price space is divided into discrete price bins, each functioning as an independent mini-pool. Uniswap V3 uses continuous concentrated liquidity where liquidity is distributed smoothly across a price range. The key difference: within a single iZiSwap bin, trades execute at exactly the bin's price (zero slippage within the bin); only when a bin is exhausted does price move to the next. This discretised structure also enables native limit orders — a feature continuous AMMs cannot provide.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f2" id="b2">
+        <h3>How do limit orders work on iZiSwap?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f2" class="faq-content" role="region" aria-labelledby="b2">
+        <p>Limit orders on iZiSwap are single-sided liquidity deposits in a specific price bin. For a buy limit (e.g. buy ETH at $2,000), you deposit USDC into the $2,000 price bin — a bin below the current price. When the market price falls to $2,000 and the AMM processes swaps through that bin, your USDC is automatically converted to ETH at exactly $2,000. No oracle, no keeper network — execution is a direct consequence of AMM mechanics. Your limit order also earns trading fees from any swaps that pass through your bin before price reaches it.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f3" id="b3">
+        <h3>What is veiZi and how does it boost LP rewards?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f3" class="faq-content" role="region" aria-labelledby="b3">
+        <p>veiZi (vote-escrowed iZi) is obtained by locking iZi tokens for a period of up to 4 years — the longer the lock, the more veiZi you receive per iZi. veiZi provides two main benefits: (1) LP reward boost — up to 2.5× multiplier on iZi farming rewards compared to the base rate; (2) governance power — veiZi holders vote on gauge weights, directing which pools receive iZi emissions. veiZi balance decays over time as your lock approaches expiry — extend your lock to maintain maximum boost and voting power.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f4" id="b4">
+        <h3>Which chains does iZiSwap support?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f4" class="faq-content" role="region" aria-labelledby="b4">
+        <p>iZiSwap is deployed on 15+ EVM chains including Ethereum, BNB Chain, Polygon, Arbitrum, Optimism, zkSync Era, Linea, Scroll, Base, Mantle, Manta Pacific, Cronos zkEVM, and Merlin Chain. iZiSwap has notably strong ZK-rollup chain coverage, often being one of the first DEXs deployed on new ZK networks. This makes iZiSwap a primary liquidity source on chains where DeFi infrastructure is still developing. Check the official iZiSwap interface for the current complete chain list as new chains are added regularly.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f5" id="b5">
+        <h3>How do I choose the right bin range for LP on iZiSwap?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f5" class="faq-content" role="region" aria-labelledby="b5">
+        <p>Bin range selection involves a trade-off between fee intensity and management overhead. Tight ranges (1–5 bins around current price) earn maximum fees per dollar deployed when price stays in range, but go out-of-range quickly and require frequent rebalancing. Wide ranges (20–100 bins) earn lower fees per dollar but require minimal management. For beginners, start with a range representing ±10–15% of current price — enough to capture a few days of normal price movement while keeping fee rates reasonable. Increase concentration as you become comfortable with rebalancing.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f6" id="b6">
+        <h3>What are the fee tiers on iZiSwap?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f6" class="faq-content" role="region" aria-labelledby="b6">
+        <p>iZiSwap offers three main fee tiers: 0.01% for stable pair pools (USDC/USDT, DAI/USDC), 0.04% for major liquid pairs (ETH/USDC, BTC/USDC), and 0.20% for mid-tier or volatile pairs. The appropriate fee tier depends on the pair's volatility — higher volatility pairs need higher fees to compensate LPs for impermanent loss risk. When choosing a pair to LP, check which fee tier has the most existing TVL, as this indicates which the market has settled on as appropriate for that pair.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f7" id="b7">
+        <h3>Is iZiSwap safe to use?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f7" class="faq-content" role="region" aria-labelledby="b7">
+        <p>iZiSwap has been audited by multiple security firms and has been operating since 2022 with significant TVL across multiple chains without a major smart-contract exploit. The primary risk for LP users is not the protocol itself but impermanent loss — particularly with aggressive concentrated positions that go out-of-range. The iZi token farming risk is that token price can fall, reducing the USD value of mining rewards. For the actual bridging and approval safety, revoke stale approvals using Revoke.cash periodically and always access iZiSwap via the bookmarked official URL (izumi.finance).</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f8" id="b8">
+        <h3>How does iZiSwap compare to Trader Joe's DLMM?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f8" class="faq-content" role="region" aria-labelledby="b8">
+        <p>Both iZiSwap and Trader Joe use discretized liquidity bin models with similar core mechanics. The key differences: iZiSwap has broader multi-chain deployment (15+ chains, strong ZK-rollup presence) versus Trader Joe's Avalanche-centric focus; iZiSwap has native limit orders while Trader Joe's DLMM doesn't; Trader Joe has deeper liquidity on Avalanche pairs while iZiSwap typically has better coverage on ZK chains. For Avalanche DeFi, Trader Joe DLMM is usually the better choice; for ZK-rollup chains or when limit orders are needed, iZiSwap leads.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-button" aria-expanded="false" aria-controls="f9" id="b9">
+        <h3>Can I use iZiSwap on a ZK-rollup chain?</h3><span class="faq-plus">+</span>
+      </button>
+      <div id="f9" class="faq-content" role="region" aria-labelledby="b9">
+        <p>Yes — iZiSwap has one of the strongest ZK-rollup presences of any DEX, deployed natively on zkSync Era, Linea, Scroll, Manta Pacific, and Mantle. On these chains, iZiSwap is often the deepest liquidity source for major pairs and one of the few venues with full DLMM functionality. Using iZiSwap on ZK-rollups provides the same bin mechanics, limit orders, and farming as on other chains, but with significantly lower gas costs (typically cents) due to ZK-rollup fee compression. Simply switch your wallet to the relevant ZK network and iZiSwap's interface adapts automatically.</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="container" role="contentinfo" style="padding:2.5rem 0; border-top:2px solid var(--line); margin-top:2rem; background:var(--bg)">
+  <p style="color:var(--light); font-size:.93rem">© 2026 iZiSwap Guide. Educational content with a security-first operational focus. Not financial advice.</p>
+</footer>
+
+<script>
+  document.querySelectorAll('.faq-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.faq-button').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        const c = document.getElementById(b.getAttribute('aria-controls'));
+        c.classList.remove('open'); c.style.maxHeight = '0';
+      });
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        const content = document.getElementById(btn.getAttribute('aria-controls'));
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px';
+      }
+    });
+  });
+</script>
+</body>
+</html>
